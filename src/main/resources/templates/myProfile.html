@@ -1,0 +1,259 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head th:replace="common/header::common-header"/>
+<body>
+
+ <div th:replace="common/header::navbar"></div>
+
+
+	<div class="container">
+		<div class="row" style="margin-bottom:-100px">
+			 <div class="col-xs-8">
+			 
+			 <h2 style="text-align: center;"> <span th:text=${user.username}> </span></h2>
+			 </div>
+			 
+			 </div>
+			 <div class="col-xs-4">
+			 </div>
+		</div>			
+		<hr style="position:absolute;width:100%; background-color:#333;height:5px;margin-top:-17px;z-index:-1"/>					
+
+
+           <!-- menu tab -->
+
+         <div class="row" style="marging-top:60px;">
+          <div class="col-xs-9 col-xs-offset-3">
+          
+          <ul class=" nav nav-tabs">
+          <li th:classappend="${classActiveEdit}? 'in active'"> <a href="#tab-1" data-toggle="tab"> <span> Edit</span></a> </li>
+           <li th:classappend="${classActiveOder}? 'in active'"> <a href="#tab-2" data-toggle="tab"> <span> Orders</span> </a></li>
+           <li th:classappend="${classActiveBilling}? 'in active'"> <a href="#tab-3" data-toggle="tab"> <span> Billing</span> </a></li>
+           <li th:classappend="${classActiveShilling}? 'in active'"> <a href="#tab-4" data-toggle="tab"> <span> Shipping</span> </a></li>
+          <li th:classappend="${classActiveView}? 'in active'"> <a href="#tab-5" data-toggle="tab"> <span> View</span> </a></li>
+           
+        
+          </ul>
+          
+          
+         <!--  edit order -->
+
+				<div class="tab-content">
+					<div class="tab-pane fade" id="tab-1"
+						th:classappend="${classActiveEdit}? 'in active'">
+						<div class="panel-group">
+							<div class="panel panel-default" style="border: none;">
+								<div class="panel-body"
+									style="background-color: #ededed; margin-top: 20px;">
+
+									
+
+									
+
+								</div>
+
+							</div>
+
+						</div>
+
+
+					</div>
+
+					<!-- orders information-->
+
+					<div class="tab-pane fade" id="tab-2"
+						th:classappend="${classActiveBilling}? 'in active'">
+						<div class="panel-group">
+							<div class="panel panel-default" style="border: none;">
+								<div class="panel-body"
+									style="background-color: #ededed; margin-top: 20px;">
+
+								<ol class="breadcrumb">
+
+									<li class="breadcrumb active"><a
+										th:href="@{/listOfCreditCard}"
+										th:style="${listOfCreditCards}? 'color:red'"> List Of
+											Credit Cards</a></li>
+
+									<li class="breadcrumb active"><a
+										th:href="@{/addNewCreditCard}"
+										th:style="${addNewCreditCard}? 'color:red'"> Add Or Update
+											Credit Card</a></li>
+
+								</ol>
+								
+								<div th:if=${lsitOfCreditCards}>
+								
+								<form th:action="@{setDefaultPayment}" method="post">
+								
+										<table>
+											<thead>
+												<tr>
+													<th>Default</th>
+													<th>Credit Card</th>
+													<th>Operations</th>
+
+												</tr>
+
+											</thead>
+											
+											
+											<tbody>
+											<tr th:each="userPayment: ${userPaymentList}"> 
+											<td> <input type="radio" name="defaultUserPaymentId" th:value="${userPayment.id}" th:checked="${userPayment.defaultPayment}"> </td>
+											 <td th:text="${userPayment.cardName}">  </td>
+											 
+											      <td> 
+											      <a th:href="@{/updateCreditCard(id=${userPayment.id})}">
+
+															<i class="fa fa-pencil"> </i>
+													</a> <a
+														th:href="@{/removeCreditCard(id=${userPayment.id})}">
+
+															<i class="fa fa-times"> </i>
+													</a>
+
+													</td>
+					
+											</tr>
+											
+											</tbody>
+											
+											
+										</table>
+										
+										<button class="btn btn-primary" type="submit"> Save</button>
+
+									</form>
+								
+								
+								</div>
+								
+								
+								<div th:if="${addNewcreditCard}">
+								
+								   <form action="@{/addNewCreditCard}" method="post">
+								    <div class="bg-info" th:if="${updateUserPaymentInfo}"> User Info Updated</div>
+								  
+								    <input type="hidden" name="id" th:value="${userPayment.id}"/>
+								    
+								    <div class="form-group">
+								    <h5> * Give a name for your Card</h5>
+								    <input type="text" th:name="cardName" placeholder="Card Name" class="form-control" th:required="required" th:value="${userPayment.cardName}"/>
+								    
+								    </div>
+								   <!--  billing address -->
+								   <hr/>
+								   
+								   <div class="form-group">
+								    <h4> Billing Address</h4>
+								   </div>
+								  
+								    <div class="form-group">
+								    <label for="billingName">* Name</label>
+								    <input type="text" class="form-control" name="userBillingName" required="required" th:value="${userBilling.userBillingName}" placeholder="User Billing Name"/>
+								    
+								    </div>
+								  
+								  
+								  </form>
+								
+								
+								
+								</div>
+								
+
+
+
+							</div>
+
+							</div>
+
+
+
+						</div>
+
+
+					</div>
+
+					<!-- billing order -->
+
+					<div class="tab-pane fade" id="tab-3"
+						th:classappend="${classActiveBilling}? 'in active'">
+						<div class="panel-group">
+							<div class="panel panel-default" style="border: none;">
+								<div class="panel-body"
+									style="background-color: #ededed; margin-top: 20px;"></div>
+
+							</div>
+
+						</div>
+
+					</div>
+
+				</div>
+				
+				
+				
+				
+          
+          
+          <!-- shipping order -->
+
+                    <div class="tab-pane fade" id="tab-4"
+                        th:classappend="${classActiveShipping}? 'in active'">
+                        <div class="panel-group">
+                            <div class="panel panel-default" style="border: none;">
+                                <div class="panel-body"
+                                    style="background-color: #ededed; margin-top: 20px;"></div>
+                                    
+                                    <!-- code goes here -->
+
+                            </div>
+
+                        </div>
+
+                    </div>
+                    
+                    
+                     <!-- 
+                           view -->
+
+                    <div class="tab-pane fade" id="tab-4"
+                        th:classappend="${classActiveView}? 'in active'">
+                        <div class="panel-group">
+                            <div class="panel panel-default" style="border: none;">
+                                <div class="panel-body"
+                                    style="background-color: #ededed; margin-top: 20px;"></div>
+                                    
+                                    <!-- code goes here -->
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+
+                </div>  <!-- end of the row -->
+                
+               
+         
+         </div>  <!-- end of the container -->
+
+
+
+
+		 
+
+
+	
+	<div th:replace="common/header::footer"></div>
+	
+	<div th:replace="common/header::body-bottom-script"></div>
+	
+
+</body>
+</html>

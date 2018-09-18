@@ -1,0 +1,97 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head th:replace="common/header::common-header"/>
+<body>
+
+ <div th:replace="common/header::navbar"></div>
+
+
+	<div class="container">
+	<h2 style="text-align: center;"> <span style="color: black;"> All Books</span></h2>
+       <hr style="position: absolute; width: 100%; background-color: #333; height: 5px; margin-top: -15px; z-index: -1" />
+
+
+         <div class="row" style="marging-top:60px;">
+          <div class="col-xs-9 col-xs-offset-3">
+          
+          <div th:if="${emptyList}">
+           <h5 style="color: red;"> Oops, No result found try something else.</h5>
+          </div>
+          
+          
+          <table class="table table-striped">
+          <thead><tr> <th> </th> </tr> </thead>
+          
+          <tbody>
+          <tr data-th-each="book: ${bookList}">
+          <td> 
+          <div th:if="${book!=null}">
+           <div class="row">
+           <div class="col-xs-3">
+          <a th:href="@{/bookDetails?id=}+${book.id}"> <img  th:src="#{adminPath}+@{/images/book/}+${book.id}+'.png'" class="img-responsive ">
+          
+          </a>
+          </div>
+           
+           <div class="col-xs-9">
+            <div class="" >
+            
+            
+            </div>
+           
+        <a th:href="@{/bookDetails?id=}+${book.id}">  <h4 th:text="${book.title}" style="color: green;"> </h4> </a> 
+       
+           <p><strong> Date Of Publication :</strong> <span th:text="${book.publicationDate}"></span> </p>
+          <p> <strong> Author :</strong><span th:text="${book.author}"></span> </p>
+          <p> <strong> Format:</strong><span th:text="${#strings.capitalize(book.format)}"></span> </p>
+           <p><strong> Number of Pages :</strong> <span th:text="${book.numberOfPages}"> Pages</span> </p>
+            
+           <p> <strong> Our Price :</strong><span style="font-size: x-large;color: aqua;">$
+            <span th:text="${#numbers.formatDecimal(book.ourPrice,0,'COMMA',2,'POINT')}"></span>
+            
+            </span> </p>
+            
+            <p>
+            <strong> List Price:</strong>
+            <span style="font-size: x-large;text-decoration: line-through;color: red;">$
+            <span th:text="${#numbers.formatDecimal(book.listPrice,0,'COMMA',2,'POINT')}"></span>
+            
+            </span>
+            </p>
+            
+           <p th:value="${#strings.abbreviate(book.descriptioin,500)}">
+           
+            </p>
+           
+           
+           
+           </div>
+           
+           </div>
+          
+          </div>
+          
+          </td>
+          </tr>
+          
+          </tbody>
+          
+          </table>
+          
+          
+          
+          </div>
+          </div>
+
+		</div>  
+
+
+	
+	<div th:replace="common/header::footer"></div>
+	
+	<div th:replace="common/header::body-bottom-script"></div>
+	
+
+</body>
+</html>
