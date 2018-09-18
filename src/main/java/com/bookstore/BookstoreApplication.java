@@ -6,7 +6,6 @@ import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import com.bookstore.domain.User;
@@ -14,7 +13,6 @@ import com.bookstore.domain.security.Role;
 import com.bookstore.domain.security.UserRole;
 import com.bookstore.service.UserService;
 import com.bookstore.utility.SecurityUtility;
-@EnableAutoConfiguration
 @SpringBootApplication
 public class BookstoreApplication  implements CommandLineRunner{
    @Autowired
