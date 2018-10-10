@@ -220,8 +220,8 @@ public class HomeController {
 
 		User user = userService.findByUsername(principal.getName());
 		model.addAttribute("user", user);
-		model.addAttribute("userPaymentList", user.getUserPaymentList());
-		model.addAttribute("userShippingList", user.getUserShippingList());
+		//model.addAttribute("userPaymentList", user.getUserPaymentList());
+		//model.addAttribute("userShippingList", user.getUserShippingList());
 
 		UserShipping userShipping = new UserShipping();
 		model.addAttribute("userShipping", userShipping);
@@ -247,9 +247,9 @@ public class HomeController {
 	public String listOfcreditCards(Model model,Principal princial,HttpServletRequest request){
 		User user=userService.findByUsername(princial.getName());
 		model.addAttribute("user",user);
-		model.addAttribute("userPaymentList",user.getUserPaymentList());
-		model.addAttribute("userShipping",user.getUserShippingList());
-		model.addAttribute("listOfCreditCards",true);
+		//model.addAttribute("userPaymentList",user.getUserPaymentList());
+		//model.addAttribute("userShipping",user.getUserShippingList());
+		//model.addAttribute("listOfCreditCards",true);
 		model.addAttribute("listOfShippingAdresses",true);
 		model.addAttribute("classActiveBilling",true);
 
@@ -277,8 +277,8 @@ public class HomeController {
 	    Collections.sort(stateList);
 	    model.addAttribute("stateList",stateList);
 	    
-	    model.addAttribute("userPaymentList", user.getUserPaymentList());
-		model.addAttribute("userShippingList", user.getUserShippingList());
+	  //  model.addAttribute("userPaymentList", user.getUserPaymentList());
+		//model.addAttribute("userShippingList", user.getUserShippingList());
 
 		 return "myProfile";
 	}
@@ -298,8 +298,8 @@ public class HomeController {
 	    Collections.sort(stateList);
 	    model.addAttribute("stateList",stateList);
 	    
-	    model.addAttribute("userPaymentList", user.getUserPaymentList());
-		model.addAttribute("userShippingList", user.getUserShippingList());
+	    //model.addAttribute("userPaymentList", user.getUserPaymentList());
+		//model.addAttribute("userShippingList", user.getUserShippingList());
 
 		 return "myProfile";
 	}
@@ -310,8 +310,8 @@ public class HomeController {
 	public String listOfShippingAdresses(Model model,Principal princial,HttpServletRequest request){
 		User user=userService.findByUsername(princial.getName());
 		model.addAttribute("user",user);
-		model.addAttribute("userPaymentList",user.getUserPaymentList());
-		model.addAttribute("userShipping",user.getUserShippingList());
+		//model.addAttribute("userPaymentList",user.getUserPaymentList());
+		//model.addAttribute("userShipping",user.getUserShippingList());
 		model.addAttribute("listOfCreditCards",true);
 		model.addAttribute("listOfShippingAdresses",true);
 		model.addAttribute("classActiveBilling",true);

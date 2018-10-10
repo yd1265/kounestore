@@ -7,14 +7,17 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 import com.bookstore.domain.User;
 
 @Entity
+@Table(name="user_role")
 public class UserRole {
    @Id
    @GeneratedValue (strategy=GenerationType.IDENTITY)
-	private long userRoleId;
+	private Long userRoleId;
+   
 	@ManyToOne(fetch=FetchType.EAGER)
 	@JoinColumn(name="user_id")
 	private User user;
@@ -31,12 +34,12 @@ public class UserRole {
 	}
 
 
-	public long getUserRoleId() {
+	public Long getUserRoleId() {
 		return userRoleId;
 	}
 
 
-	public void setUserRoleId(long userRoleId) {
+	public void setUserRoleId(Long userRoleId) {
 		this.userRoleId = userRoleId;
 	}
 

@@ -1,20 +1,10 @@
 package com.bookstore.domain;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
 
-@Entity
 public class UserPayment {
 
 	
-	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	
 	private Long id;
 	
 	private String type;
@@ -31,12 +21,9 @@ public class UserPayment {
 	
 	private boolean defaultPayment;
 	
-	@ManyToOne
-	@JoinColumn(name="user_id")
 	
 	private User user;
 	
-	@OneToOne(cascade=CascadeType.ALL,mappedBy="userPayment")
 	private UserBilling userBilling;
 
 	public Long getId() {

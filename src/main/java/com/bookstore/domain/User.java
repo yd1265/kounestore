@@ -2,7 +2,6 @@ package com.bookstore.domain;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -23,7 +22,7 @@ import com.bookstore.domain.security.UserRole;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
-@Table(name="user")
+@Table(name="users")
 public class User implements UserDetails {
 	/**
 	 * 
@@ -31,8 +30,9 @@ public class User implements UserDetails {
 	private static final long serialVersionUID = 1L;
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	@Column(name="id",nullable=false,updatable=false)
-private long id;
+	@Column(name="user_id",nullable=false,updatable=false)
+private Long id;
+	
 private String username;
 private String password;
 private String firstName;
@@ -47,20 +47,15 @@ private boolean enabled=true;
 @JsonIgnore
 private Set<UserRole> userRoles=new HashSet<UserRole>();
 
-@OneToMany(cascade=CascadeType.ALL, mappedBy="user")
-private List<UserShipping> userShippingList;
 
-
-@OneToMany(cascade=CascadeType.ALL, mappedBy="user")
-private List<UserPayment> userPaymentList;
 
 public User() {
 	
 }
-public long getId() {
+public Long getId() {
 	return id;
 }
-public void setId(long id) {
+public void setId(Long id) {
 	this.id = id;
 }
 public String getUsername() {
@@ -130,18 +125,7 @@ public boolean isAccountNonLocked() {
 public boolean isCredentialsNonExpired() {
 	return true;
 }
-public List<UserShipping> getUserShippingList() {
-	return userShippingList;
-}
-public void setUserShippingList(List<UserShipping> userShippingList) {
-	this.userShippingList = userShippingList;
-}
-public List<UserPayment> getUserPaymentList() {
-	return userPaymentList;
-}
-public void setUserPaymentList(List<UserPayment> userPaymentList) {
-	this.userPaymentList = userPaymentList;
-}
+
 
 
 }
