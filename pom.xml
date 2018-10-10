@@ -41,12 +41,12 @@
             <artifactId>spring-boot-starter-mail</artifactId>
         </dependency>  
 		
-		
-		<dependency>
-				<groupId>postgresql</groupId>
-				<artifactId>postgresql</artifactId>
-				<version>9.0-801.jdbc4</version>
+					
+			<dependency>
+			    <groupId>org.postgresql</groupId>
+			    <artifactId>postgresql</artifactId>
 			</dependency>
+		
 			
 			
 			<dependency>
