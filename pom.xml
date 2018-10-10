@@ -14,8 +14,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.0.4.RELEASE</version>
-		<relativePath/> <!-- lookup parent from repository -->
+         <version>2.0.1.RELEASE</version>
 	</parent>
 
 	<properties>
@@ -41,15 +40,19 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-mail</artifactId>
         </dependency>  
-		<dependency>
-			<groupId>javax.mail</groupId>
-			<artifactId>mail</artifactId>
-		</dependency>
 		
-			<!-- https://mvnrepository.com/artifact/org.postgresql/postgresql -->
+		
+		<dependency>
+				<groupId>postgresql</groupId>
+				<artifactId>postgresql</artifactId>
+				<version>9.0-801.jdbc4</version>
+			</dependency>
+			
+			
 			<dependency>
-			    <groupId>org.postgresql</groupId>
-			    <artifactId>postgresql</artifactId>
+				<groupId>javax.mail</groupId>
+				<artifactId>mail</artifactId>
+				<version>1.4.7</version>
 			</dependency>
 		
 		<dependency>
@@ -85,18 +88,12 @@
 			<artifactId>mysql-connector-java</artifactId>
 		</dependency>
 		
-					<!-- https://mvnrepository.com/artifact/postgresql/postgresql -->
-			<dependency>
-			    <groupId>postgresql</groupId>
-			    <artifactId>postgresql</artifactId>
-			</dependency>
 					
-					<!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-1.2-api -->
-					<dependency>
-					    <groupId>org.apache.logging.log4j</groupId>
-					    <artifactId>log4j-1.2-api</artifactId>
-					    </dependency>
-
+	 <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.17</version>
+        </dependency>
 		
 		
 		<dependency>
@@ -136,18 +133,5 @@
             </plugin>
         </plugins>
     </build>
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>postgresql</groupId>
-				<artifactId>postgresql</artifactId>
-				<version>9.0-801.jdbc4</version>
-			</dependency>
-			<dependency>
-				<groupId>javax.mail</groupId>
-				<artifactId>mail</artifactId>
-				<version>1.4.7</version>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
+	
 </project>
