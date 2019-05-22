@@ -1,29 +1,34 @@
 package com.bookstore.domain;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 
+@Entity
 public class UserPayment {
 
-	
-	
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	
 	private String type;
 	private String cardName;
-	
 	private String cardNumber;
-	
-	private String holderName;
-	
 	private int expiryMonth;
-	
 	private int expiryYear;
 	private int cvc;
-	
+	private String holderName;
 	private boolean defaultPayment;
 	
-	
+	@ManyToOne
+	@JoinColumn(name="user_id")
 	private User user;
 	
+	@OneToOne(cascade = CascadeType.ALL, mappedBy = "userPayment")
 	private UserBilling userBilling;
 
 	public Long getId() {
@@ -58,14 +63,6 @@ public class UserPayment {
 		this.cardNumber = cardNumber;
 	}
 
-	public String getHolderName() {
-		return holderName;
-	}
-
-	public void setHolderName(String holderName) {
-		this.holderName = holderName;
-	}
-
 	public int getExpiryMonth() {
 		return expiryMonth;
 	}
@@ -88,6 +85,14 @@ public class UserPayment {
 
 	public void setCvc(int cvc) {
 		this.cvc = cvc;
+	}
+
+	public String getHolderName() {
+		return holderName;
+	}
+
+	public void setHolderName(String holderName) {
+		this.holderName = holderName;
 	}
 
 	public boolean isDefaultPayment() {
@@ -113,7 +118,6 @@ public class UserPayment {
 	public void setUserBilling(UserBilling userBilling) {
 		this.userBilling = userBilling;
 	}
-	
 	
 	
 }

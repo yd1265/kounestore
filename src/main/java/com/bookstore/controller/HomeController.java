@@ -7,8 +7,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.websocket.server.PathParam;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -16,13 +18,17 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+
 import com.bookstore.domain.Book;
+import com.bookstore.domain.CartItem;
+import com.bookstore.domain.Order;
 import com.bookstore.domain.User;
 import com.bookstore.domain.UserBilling;
 import com.bookstore.domain.UserPayment;
@@ -31,8 +37,12 @@ import com.bookstore.domain.security.PasswordResetToken;
 import com.bookstore.domain.security.Role;
 import com.bookstore.domain.security.UserRole;
 import com.bookstore.service.BookService;
+import com.bookstore.service.CartItemService;
+import com.bookstore.service.OrderService;
+import com.bookstore.service.UserPaymentService;
 import com.bookstore.service.UserSecurityService;
 import com.bookstore.service.UserService;
+import com.bookstore.service.UserShippingService;
 import com.bookstore.utility.MailConstructor;
 import com.bookstore.utility.SecurityUtility;
 import com.bookstore.utility.USConstants;
@@ -56,6 +66,29 @@ public class HomeController {
 	private BookService bookService;
 	
 	
+	
+	@Autowired
+	private UserPaymentService userPaymentService;
+	
+	@Autowired
+	private UserShippingService userShippingService;
+	
+	
+	@Autowired
+	private CartItemService cartItemService;
+	
+	@Autowired
+	private OrderService orderService;
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	@RequestMapping("/")
 	public String homePage() {
 
@@ -74,84 +107,212 @@ public class HomeController {
 		return "myAccount";
 	}
 
+	
+	
+	@RequestMapping("/hours")
+	public String hours() {
+		
+		return "hours";
+	}
+	
+	
+	@RequestMapping("/faq")
+	public String faq() {
+		
+		return "faq";
+	}
 	/*
 	 *  new User 
 	 */
-	@RequestMapping(value = "/newUser", method = RequestMethod.POST)
-	public String newUserPost(HttpServletRequest request,
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	@RequestMapping(value="/newUser", method = RequestMethod.POST)
+	public String newUserPost(
+			HttpServletRequest request,
+			@ModelAttribute("email") String userEmail,
 			@ModelAttribute("username") String username,
-			@ModelAttribute("email") String email, Model model)throws Exception {
-
-		model.addAttribute("classActiveNewAccount", true);
-		model.addAttribute("email", email);
+			Model model
+			) throws Exception{
+		model.addAttribute("classActiveAccount", true);
+		model.addAttribute("email", userEmail);
 		model.addAttribute("username", username);
-
+		
 		if (userService.findByUsername(username) != null) {
-			model.addAttribute("userExist", true);
+			model.addAttribute("usernameExists", true);
+			
 			return "myAccount";
 		}
-
-		if (userService.findByEmail(email) != null) {
-			model.addAttribute("emailExist", true);
-
+		
+		if (userService.findByEmail(userEmail) != null) {
+			model.addAttribute("emailExists", true);
+			
 			return "myAccount";
 		}
-
+		
 		User user = new User();
 		user.setUsername(username);
-		user.setEmail(email);
-
+		user.setEmail(userEmail);
+		
 		String password = SecurityUtility.randomPassword();
-		String encryptedPasword = SecurityUtility.passwordEncoder().encode(password);
-		user.setPassword(encryptedPasword);
+		
+		String encryptedPassword = SecurityUtility.passwordEncoder().encode(password);
+		user.setPassword(encryptedPassword);
+		
 		Role role = new Role();
 		role.setRoleId(1);
 		role.setName("ROLE_USER");
-
-		Set<UserRole> userRoles = new HashSet<UserRole>();
+		Set<UserRole> userRoles = new HashSet<>();
 		userRoles.add(new UserRole(user, role));
 		userService.createUser(user, userRoles);
-
-		String token = UUID.randomUUID().toString();
 		
+		String token = UUID.randomUUID().toString();
 		userService.createPasswordResetTokenForUser(user, token);
 		
-		String appUrl = "http://" + request.getServerName() + ":"+ request.getServerPort() + request.getContextPath();
+		String appUrl = "http://"+request.getServerName()+":"+request.getServerPort()+request.getContextPath();
 		
-		SimpleMailMessage myemail = mailConstructor.constructResetTokenEmail(appUrl, request.getLocale(), token, user, password);
+		SimpleMailMessage email = mailConstructor.constructResetTokenEmail(appUrl, request.getLocale(), token, user, password);
 		
-		mailSender.send(myemail);
-		model.addAttribute("emailSent",true);
-
+		mailSender.send(email);
+		
+		model.addAttribute("emailSent", "true");
+		
+		model.addAttribute("orderList",user.getOrderList());
+		
 		return "myAccount";
-
 	}
 	
-	/*
-	 * Getting the connection 
-	 */
 
 	@RequestMapping("/newUser")
-	public String newUser(Model model, Locale locale,@RequestParam("token") String token) {
-		PasswordResetToken passtoken = userService.getPasswordResetToken(token);
-		if (passtoken == null) {
-			String message = "Invalid Token !";
+	public String newUser(Locale locale, @RequestParam("token") String token, Model model) {
+		PasswordResetToken passToken = userService.getPasswordResetToken(token);
+
+		if (passToken == null) {
+			String message = "Invalid Token.";
 			model.addAttribute("message", message);
 			return "redirect:/badRequest";
 		}
-		User user = passtoken.getUser();
+
+		User user = passToken.getUser();
 		String username = user.getUsername();
+
 		UserDetails userDetails = userSecurityService.loadUserByUsername(username);
 
-		Authentication authentication = new UsernamePasswordAuthenticationToken(
-				userDetails, userDetails.getPassword(),
+		Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, userDetails.getPassword(),
 				userDetails.getAuthorities());
+		
 		SecurityContextHolder.getContext().setAuthentication(authentication);
+		
+		model.addAttribute("user", user);
 
 		model.addAttribute("classActiveEdit", true);
-		model.addAttribute("user",user);
+		
+		
 		return "myProfile";
 	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 
 	@RequestMapping("/forgetPassword")
 	public String forgetPassword(HttpServletRequest request, @ModelAttribute("email") String email, Model model)throws Exception{
@@ -186,12 +347,37 @@ public class HomeController {
 	}
 	
 	
-	@RequestMapping("/bookshelf")
-	public String bookshelf( Model model){
-	  List<Book> bookList=bookService.findAllBooks();
-	  model.addAttribute("bookList",bookList);
 		
-		return "bookshelf";
+	
+		
+		@RequestMapping("/bookshelf")
+		public String bookshelf(Model model, Principal principal) {
+			if(principal != null) {
+				String username = principal.getName();
+				User user = userService.findByUsername(username);
+				model.addAttribute("user", user);
+			}
+			
+			List<Book> bookList = bookService.findAllBooks();
+			model.addAttribute("bookList", bookList);
+			model.addAttribute("activeAll",true);
+			
+			return "bookshelf";
+
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
 		
 	}
 	
@@ -220,12 +406,15 @@ public class HomeController {
 
 		User user = userService.findByUsername(principal.getName());
 		model.addAttribute("user", user);
-		//model.addAttribute("userPaymentList", user.getUserPaymentList());
-		//model.addAttribute("userShippingList", user.getUserShippingList());
-
+		model.addAttribute("userPaymentList", user.getUserPaymentList());
+		model.addAttribute("userShippingList", user.getUserShippingList());
+		model.addAttribute("orderList", user.getOrderList());
+		
+		
 		UserShipping userShipping = new UserShipping();
 		model.addAttribute("userShipping", userShipping);
-		model.addAttribute("listOfCreditCard", true);
+		
+		model.addAttribute("listOfCreditCards", true);
 		model.addAttribute("listOfShippingAdresses", true);
 
 		List<String> stateList = USConstants.listOfStatesCode;
@@ -243,13 +432,16 @@ public class HomeController {
 	 * to print the credit card
 	 */
 	
-	@RequestMapping("/listOfCreditCard")
-	public String listOfcreditCards(Model model,Principal princial,HttpServletRequest request){
-		User user=userService.findByUsername(princial.getName());
+	@RequestMapping("/listOfCreditCards")
+	public String listOfcreditCards(Model model,Principal principal,HttpServletRequest request){
+		
+		User user=userService.findByUsername(principal.getName());
 		model.addAttribute("user",user);
-		//model.addAttribute("userPaymentList",user.getUserPaymentList());
-		//model.addAttribute("userShipping",user.getUserShippingList());
-		//model.addAttribute("listOfCreditCards",true);
+		model.addAttribute("userPaymentList",user.getUserPaymentList());
+		model.addAttribute("userShipping",user.getUserShippingList());
+		model.addAttribute("orderList",user.getOrderList());
+		
+		model.addAttribute("listOfCreditCards",true);
 		model.addAttribute("listOfShippingAdresses",true);
 		model.addAttribute("classActiveBilling",true);
 
@@ -263,11 +455,15 @@ public class HomeController {
 	  */
 	
 	@RequestMapping("/addNewCreditCard")
-	public String addNewCreditCard(Model model, Principal princial){
-	    User user=userService.findByUsername(princial.getName());
+	public String addNewCreditCard(Model model, Principal principal){
+	    User user=userService.findByUsername(principal.getName());
 	    model.addAttribute("user",user);
-	    model.addAttribute("addNewcreditCard",true);
+	    
+	    model.addAttribute("addNewCreditCard",true);
 	    model.addAttribute("classActiveBilling",true);
+	    model.addAttribute("listOfShippingAdresses",true);
+	    
+	    
 	    UserBilling userBilling=new UserBilling();
 	    UserPayment  userPayment=new UserPayment();
 	    
@@ -277,48 +473,456 @@ public class HomeController {
 	    Collections.sort(stateList);
 	    model.addAttribute("stateList",stateList);
 	    
-	  //  model.addAttribute("userPaymentList", user.getUserPaymentList());
-		//model.addAttribute("userShippingList", user.getUserShippingList());
+	   model.addAttribute("userPaymentList", user.getUserPaymentList());
+	   model.addAttribute("userShippingList", user.getUserShippingList());
+	   model.addAttribute("orderList",user.getOrderList());
 
 		 return "myProfile";
 	}
 	
-	@RequestMapping("/addNewShippingAdress")
-	public String addNewShiipingAdress(Model model, Principal princial){
-	    User user=userService.findByUsername(princial.getName());
+	
+	
+	
+	
+	
+	
+	
+	@RequestMapping(value="/addNewShippingAddress", method=RequestMethod.POST)
+	public String addNewShippingAddress(
+			@ModelAttribute("userShipping") UserShipping userShipping,
+			Principal principal, Model model
+			){
+		User user = userService.findByUsername(principal.getName());
+		userService.updateUserShipping(userShipping, user);
+		
+		model.addAttribute("user", user);
+		model.addAttribute("userPaymentList", user.getUserPaymentList());
+		model.addAttribute("userShippingList", user.getUserShippingList());
+		model.addAttribute("listOfShippingAddresses", true);
+		model.addAttribute("classActiveShipping", true);
+		model.addAttribute("listOfCreditCards", true);
+		model.addAttribute("orderList",user.getOrderList());
+		
+		return "myProfile";
+	}
+	
+	
+	
+	
+	
+	@RequestMapping("/updateUserShipping")
+	public String updateUserShipping(
+			@ModelAttribute("id") Long shippingAddressId, Principal principal, Model model
+			) {
+		User user = userService.findByUsername(principal.getName());
+		UserShipping userShipping = userShippingService.findById(shippingAddressId);
+		
+		if(user.getId() != userShipping.getUser().getId()) {
+			return "badRequestPage";
+		} else {
+			model.addAttribute("user", user);
+			
+			model.addAttribute("userShipping", userShipping);
+			
+			List<String> stateList = USConstants.listOfStatesCode;
+			Collections.sort(stateList);
+			model.addAttribute("stateList", stateList);
+			
+			model.addAttribute("addNewShippingAddress", true);
+			model.addAttribute("classActiveShipping", true);
+			model.addAttribute("listOfCreditCards", true);
+			
+			model.addAttribute("userPaymentList", user.getUserPaymentList());
+			model.addAttribute("userShippingList", user.getUserShippingList());
+			model.addAttribute("orderList",user.getOrderList());
+			
+			return "myProfile";
+		}
+	}
+	
+	
+	
+	
+	
+	
+	
+	@RequestMapping(value="/setDefaultShippingAddress", method=RequestMethod.POST)
+	public String setDefaultShippingAddress(
+			@ModelAttribute("defaultShippingAddressId") Long defaultShippingId, Principal principal, Model model
+			) {
+		User user = userService.findByUsername(principal.getName());
+		userService.setUserDefaultShipping(defaultShippingId, user);
+		
+		model.addAttribute("user", user);
+		model.addAttribute("listOfCreditCards", true);
+		model.addAttribute("classActiveShipping", true);
+		model.addAttribute("listOfShippingAddresses", true);
+		
+		model.addAttribute("userPaymentList", user.getUserPaymentList());
+		model.addAttribute("userShippingList", user.getUserShippingList());
+		model.addAttribute("orderList",user.getOrderList());
+		
+		return "myProfile";
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	@RequestMapping("/removeUserShipping")
+	public String removeUserShipping(
+			@ModelAttribute("id") Long userShippingId, Principal principal, Model model
+			){
+		User user = userService.findByUsername(principal.getName());
+		UserShipping userShipping = userShippingService.findById(userShippingId);
+		
+		if(user.getId() != userShipping.getUser().getId()) {
+			return "badRequestPage";
+		} else {
+			model.addAttribute("user", user);
+			
+			userShippingService.removeById(userShippingId);
+			
+			model.addAttribute("listOfShippingAddresses", true);
+			model.addAttribute("classActiveShipping", true);
+			
+			model.addAttribute("userPaymentList", user.getUserPaymentList());
+			model.addAttribute("userShippingList", user.getUserShippingList());
+			
+			return "myProfile";
+		}
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	@RequestMapping("/updateCreditCard")
+	public String updateCreditCard(
+			@ModelAttribute("id") Long creditCardId, Principal principal, Model model
+			) {
+		User user = userService.findByUsername(principal.getName());
+		UserPayment userPayment = userPaymentService.findById(creditCardId);
+		
+		if(user.getId() != userPayment.getUser().getId()) {
+			return "badRequestPage";
+		} else {
+			model.addAttribute("user", user);
+			UserBilling userBilling = userPayment.getUserBilling();
+			model.addAttribute("userPayment", userPayment);
+			model.addAttribute("userBilling", userBilling);
+			
+			List<String> stateList = USConstants.listOfStatesCode;
+			Collections.sort(stateList);
+			model.addAttribute("stateList", stateList);
+			
+			model.addAttribute("addNewCreditCard", true);
+			model.addAttribute("classActiveBilling", true);
+			model.addAttribute("listOfShippingAddresses", true);
+			
+			model.addAttribute("userPaymentList", user.getUserPaymentList());
+			model.addAttribute("userShippingList", user.getUserShippingList());
+			model.addAttribute("orderList",user.getOrderList());
+			
+			return "myProfile";
+		}
+	}
+	
+	
+	
+	@RequestMapping("/removeCreditCard")
+	public String removeCreditCard(
+			@ModelAttribute("id") Long creditCardId, Principal principal, Model model
+			){
+		User user = userService.findByUsername(principal.getName());
+		UserPayment userPayment = userPaymentService.findById(creditCardId);
+		
+		if(user.getId() != userPayment.getUser().getId()) {
+			return "badRequestPage";
+		} else {
+			model.addAttribute("user", user);
+			userPaymentService.removeById(creditCardId);
+			
+			model.addAttribute("listOfCreditCards", true);
+			model.addAttribute("classActiveBilling", true);
+			model.addAttribute("listOfShippingAddresses", true);
+			
+			model.addAttribute("userPaymentList", user.getUserPaymentList());
+			model.addAttribute("userShippingList", user.getUserShippingList());
+			model.addAttribute("orderList",user.getOrderList());
+			
+			return "myProfile";
+		}
+	}
+	
+	
+	
+	
+	@RequestMapping(value="/setDefaultPayment", method=RequestMethod.POST)
+	public String setDefaultPayment(
+			@ModelAttribute("defaultUserPaymentId") Long defaultPaymentId, Principal principal, Model model
+			) {
+		User user = userService.findByUsername(principal.getName());
+		userService.setUserDefaultPayment(defaultPaymentId, user);
+		
+		model.addAttribute("user", user);
+		model.addAttribute("listOfCreditCards", true);
+		model.addAttribute("classActiveBilling", true);
+		model.addAttribute("listOfShippingAddresses", true);
+		
+		model.addAttribute("userPaymentList", user.getUserPaymentList());
+		model.addAttribute("userShippingList", user.getUserShippingList());
+		model.addAttribute("orderList",user.getOrderList());
+		
+		return "myProfile";
+	
+	
+
+	
+	
+
+	
+	
+	
+	
+	
+	
+	
+	
+     }
+	
+	@RequestMapping("/addNewShippingAddress")
+	public String addNewShippingAddress(Model model, Principal principal){
+	    User user=userService.findByUsername(principal.getName());
 	    model.addAttribute("user",user);
-	    model.addAttribute("addNewShippingAdress",true);
+	    
+	    model.addAttribute("addNewShippingAddress",true);
 	    model.addAttribute("classActiveShipping",true);
-	    UserBilling userBilling=new UserBilling();
+	    model.addAttribute("listOfCreditCards",true);
+	    
+	    
 	    UserShipping  userShipping=new UserShipping();
 	    
-	    model.addAttribute("userBilling",userBilling);
 	    model.addAttribute("userShipping",userShipping);
+	    
 	    List<String> stateList=USConstants.listOfStatesCode;
 	    Collections.sort(stateList);
 	    model.addAttribute("stateList",stateList);
 	    
-	    //model.addAttribute("userPaymentList", user.getUserPaymentList());
-		//model.addAttribute("userShippingList", user.getUserShippingList());
-
+	    model.addAttribute("userPaymentList", user.getUserPaymentList());
+		model.addAttribute("userShippingList", user.getUserShippingList());
+	    model.addAttribute("orderList",user.getOrderList());
 		 return "myProfile";
 	}
 	
 	
+	@RequestMapping(value="/addNewCreditCard", method=RequestMethod.POST)
+	public String addNewCreditCard(
+			@ModelAttribute("userPayment") UserPayment userPayment,
+			@ModelAttribute("userBilling") UserBilling userBilling,
+			Principal principal, Model model
+			){
+		User user = userService.findByUsername(principal.getName());
+		userService.updateUserBilling(userBilling, userPayment, user);
+		
+		model.addAttribute("user", user);
+		model.addAttribute("userPaymentList", user.getUserPaymentList());
+		model.addAttribute("userShippingList", user.getUserShippingList());
+		model.addAttribute("listOfCreditCards", true);
+		model.addAttribute("classActiveBilling", true);
+		model.addAttribute("listOfShippingAddresses", true);
+		model.addAttribute("orderList",user.getOrderList());
+		
+		return "myProfile";
 	
-	@RequestMapping("/listOfShippingAdresses")
-	public String listOfShippingAdresses(Model model,Principal princial,HttpServletRequest request){
-		User user=userService.findByUsername(princial.getName());
+	
+	
+
+	
+	
+    }
+	@RequestMapping("/listOfShippingAddresses")
+	public String listOfShippingAddresses(Model model,Principal principal,HttpServletRequest request){
+		User user=userService.findByUsername(principal.getName());
 		model.addAttribute("user",user);
-		//model.addAttribute("userPaymentList",user.getUserPaymentList());
-		//model.addAttribute("userShipping",user.getUserShippingList());
+		model.addAttribute("userPaymentList",user.getUserPaymentList());
+		model.addAttribute("userShipping",user.getUserShippingList());
+		model.addAttribute("orderList",user.getOrderList());
+		
 		model.addAttribute("listOfCreditCards",true);
-		model.addAttribute("listOfShippingAdresses",true);
-		model.addAttribute("classActiveBilling",true);
+		model.addAttribute("listOfShippingAddresses",true);
+		model.addAttribute("classActiveShipping",true);
 				
 		return "myProfile";
 	
 }
 	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@RequestMapping(value="/updateUserInfo", method=RequestMethod.POST)
+public String updateUserInfo(
+		@ModelAttribute("user") User user,
+		@ModelAttribute("newPassword") String newPassword,
+		Model model
+		) throws Exception {
+	User currentUser = userService.findById(user.getId());
+	
+	if(currentUser == null) {
+		throw new Exception ("User not found");
+	}
+	
+	/*check email already exists*/
+	if (userService.findByEmail(user.getEmail())!=null) {
+		if(userService.findByEmail(user.getEmail()).getId() != currentUser.getId()) {
+			model.addAttribute("emailExists", true);
+			return "myProfile";
+		}
+	}
+	
+	/*check username already exists*/
+	if (userService.findByUsername(user.getUsername())!=null) {
+		if(userService.findByUsername(user.getUsername()).getId() != currentUser.getId()) {
+			model.addAttribute("usernameExists", true);
+			return "myProfile";
+		}
+	}
+	
+//	update password
+	if (newPassword != null && !newPassword.isEmpty() && !newPassword.equals("")){
+		BCryptPasswordEncoder passwordEncoder = SecurityUtility.passwordEncoder();
+		String dbPassword = currentUser.getPassword();
+		if(passwordEncoder.matches(user.getPassword(), dbPassword)){
+			currentUser.setPassword(passwordEncoder.encode(newPassword));
+		} else {
+			model.addAttribute("incorrectPassword", true);
+			
+			return "myProfile";
+		}
+	}
+	
+	currentUser.setFirstName(user.getFirstName());
+	currentUser.setLastName(user.getLastName());
+	currentUser.setUsername(user.getUsername());
+	currentUser.setEmail(user.getEmail());
+	
+	userService.save(currentUser);
+	
+	model.addAttribute("updateSuccess", true);
+	model.addAttribute("user", currentUser);
+	model.addAttribute("classActiveEdit", true);
+	
+	model.addAttribute("listOfShippingAddresses", true);
+	model.addAttribute("listOfCreditCards",true);
+	
+	UserDetails userDetails = userSecurityService.loadUserByUsername(currentUser.getUsername());
+
+	Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, userDetails.getPassword(),
+			userDetails.getAuthorities());
+	
+	SecurityContextHolder.getContext().setAuthentication(authentication);
+	
+	
+	model.addAttribute("orderList",user.getOrderList());
+	
+	return "myProfile";
 }
+
+
+
+
+
+
+@RequestMapping("/orderDetail")
+public String orderDetail(
+		@RequestParam("id") Long orderId,
+		Principal principal, Model model
+		){
+	User user = userService.findByUsername(principal.getName());
+	Order order = orderService.findOne(orderId);
+	
+	if(order.getUser().getId()!=user.getId()) {
+		return "badRequestPage";
+	} else {
+		List<CartItem> cartItemList = cartItemService.findByOrder(order);
+		model.addAttribute("cartItemList", cartItemList);
+		model.addAttribute("user", user);
+		model.addAttribute("order", order);
+		
+		model.addAttribute("userPaymentList", user.getUserPaymentList());
+		model.addAttribute("userShippingList", user.getUserShippingList());
+		model.addAttribute("orderList", user.getOrderList());
+		
+		UserShipping userShipping = new UserShipping();
+		model.addAttribute("userShipping", userShipping);
+		
+		List<String> stateList = USConstants.listOfStatesCode;
+		Collections.sort(stateList);
+		model.addAttribute("stateList", stateList);
+		
+		model.addAttribute("listOfShippingAddresses", true);
+		model.addAttribute("classActiveOrders", true);
+		model.addAttribute("listOfCreditCards", true);
+		model.addAttribute("displayOrderDetail", true);
+		
+		
+		return "myProfile";
+	}
+}
+
+
+
+
+}
+
 

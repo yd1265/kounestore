@@ -8,9 +8,10 @@
 
 
 
+	
 	<div class="container">
 	
-		<form th:action="@{/shopping/adItem}" method="post">
+		<form th:action="@{/shoppingCart/addItem}" method="post">
 			<input type="hidden" name="id" th:value="${book.id}" id="id">
 
 			<div class="row" style="margin-top: 50px; margin-bottom: 50px;">
@@ -73,7 +74,7 @@
 									<div class="row">
 										<div class="col-xs-6">
 											<h4>
-												Our Price: <span>$</span> <span th:text="${book.ourPrice}"></span>
+												Our Price: <span style="color:#db3208;">$<span th:text="${book.ourPrice}"></span></span>
 											</h4>
 
 											<p>
@@ -100,11 +101,23 @@
 											<h4
 												th:if="${book.inStockNumber&lt;10 and book.inStockNumber&gt;0}"
 												style="color:green;">
-												Only <span th:text="${book.inStockNumber}" ></span> <span style="color: green"> In Stock</span> 
-											</h4>
-											<h4 th:if="${book.inStockNumber==0}" style="color: red;">Unavailable</h4>
-											<button class="btn bg-warning" style="color: black;">
-												Add to Cart</button>
+												Only <span th:text="${book.inStockNumber}" ></span> <span style="color: green"> </span>In Stock </h4>
+										
+											
+											
+											
+											
+											<h4 th:if="${book.inStockNumber==0}" style="color:darkred;">Unavailable</h4>
+											
+											
+					
+											
+											
+											
+											<button type="submit" class="btn btn-warning" style="color:black;border:1px solid black; padding: 10px 40px 10px 40px;">Add to Cart</button>
+											
+											
+											
 
 										</div>
 									</div>
@@ -122,7 +135,7 @@
 
                     <hr>
                         <strong> Description:</strong>
-                        <p th:utext="${book.descriptioin}"> </p>
+                        <p th:utext="${book.description}"> </p>
 
 				</div>
 
@@ -135,8 +148,30 @@
 
 	</div>
 	<!-- start container -->
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 
-	<div th:replace="common/header::footer"></div>
 
 	<div th:replace="common/header::body-bottom-script"></div>
 

@@ -8,15 +8,49 @@
 
 
 	<div class="container">
-	<h2 style="text-align: center;"> <span style="color: black;"> All Books</span></h2>
-       <hr style="position: absolute; width: 100%; background-color: #333; height: 5px; margin-top: -15px; z-index: -1" />
+    <div class="row" style="margin-bottom: -100px;">
+        <div class="col-xs-8">
+            <h2 class="section-headline">
+                <h2 class="section-headline">
+                    <span th:text="${user}? ${#strings.toUpperCase(user.username)} : 'All Books'"></span>
+                </h2>
+            </h2>
+
+         </div>
+
+ <div align="right">
+            <img src="/images/store.png" class="img-responsive"/>
+        </div>
+       </div>
+
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
 
 
-         <div class="row" style="marging-top:60px;">
-          <div class="col-xs-9 col-xs-offset-3">
+
+
+
+         <div class="row" style="margin-top: 60px;">
+			<div class="col-xs-3">
+				<h3><label for="category">Category</label></h3>
+				<div class="list-group" id="category">
+					<a th:href="@{/bookshelf(category='all')}" th:classappend="${activeAll}? 'active'" class="list-group-item">All</a>
+					<a th:href="@{/searchByCategory(category='Management')}" th:classappend="${activeManagement}? 'active'" class="list-group-item">Management</a>
+					<a th:href="@{/searchByCategory(category='Fiction')}" th:classappend="${activeFiction}? 'active'" class="list-group-item">Fiction</a>
+					<a th:href="@{/searchByCategory(category='Engineering')}" th:classappend="${activeEngineering}? 'active'" class="list-group-item">Engineering</a>
+					<a th:href="@{/searchByCategory(category='Programming')}" th:classappend="${activeProgramming}? 'active'" class="list-group-item">Programming</a>
+					<a th:href="@{/searchByCategory(category='Arts &amp; Literature')}" th:classappend="${activeArtsLiterature}? 'active'" class="list-group-item">Arts &amp; Literature</a>
+				</div>
+			</div>
+        
           
+          
+          <div class="col-xs-9">
           <div th:if="${emptyList}">
-           <h5 style="color: red;"> Oops, No result found try something else.</h5>
+           <h5 style="color: red;"> Oops, No result found .Try something else or try again later.</h5>
           </div>
           
           
@@ -29,7 +63,11 @@
           <div th:if="${book!=null}">
            <div class="row">
            <div class="col-xs-3">
-          <a th:href="@{/bookDetails?id=}+${book.id}"> <img  th:src="#{adminPath}+@{/images/book/}+${book.id}+'.png'" class="img-responsive ">
+          <a th:href="@{/bookDetails?id=}+${book.id}"> <img th:src="#{adminPath}+@{/images/book/}+${book.id}+'.png'"  class="img-responsive"/>
+          
+          
+          
+          
           
           </a>
           </div>
@@ -60,7 +98,7 @@
             </span>
             </p>
             
-           <p th:value="${#strings.abbreviate(book.descriptioin,500)}">
+           <p th:value="${#strings.abbreviate(book.description,500)}">
            
             </p>
            
@@ -88,9 +126,17 @@
 
 
 	
-	<div th:replace="common/header::footer"></div>
+	
 	
 	<div th:replace="common/header::body-bottom-script"></div>
+	
+	
+	
+	
+	
+	
+	
+	
 	
 
 </body>

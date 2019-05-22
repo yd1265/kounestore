@@ -11,30 +11,28 @@
 		<div class="row" style="margin-bottom: -100px">
 			<div class="col-xs-8">
 				<h2 style="text-align: center;">
-					<span style="background-color: richness: ;"> User Account</span>
-				</h2>
+					<span style="background-color: richness: ;"> User Account</span> </h2>
+				
 			</div>
-			<div class="col-xs-2">
-				<img  th:src="@{/images/kounestore.jpg}" class="img-responsive" style="margin-top: -20px; width: 150px;" />
+			<div class="col-xs-4">
+				<img src="/images/store.png" class="img-responsive" />
 			</div>
 		</div>
 		<hr
 			style="position: absolute; width: 100%; background-color: #333; height: 5px; margin-top: 15px; z-index: -1" />
 
 
+
+
+
+
 		<div class="row" style="marging-top: -60px;">
 			<div class="col-xs-6">
 
 				<ul class=" nav nav-tabs">
-					<li th:classappend="${classActiveAccount}? 'in active'"><a
-						href="#tab-1" data-toggle="tab"> <span> Create new
-								Account</span></a></li>
-					<li th:classappend="${classActiveLogin}? 'in active'"><a
-						href="#tab-2" data-toggle="tab"> <span> Login</span>
-					</a></li>
-					<li th:classappend="${classActiveReset}? 'in active'"><a
-						href="#tab-3" data-toggle="tab"> <span> Forget Password</span>
-					</a></li>
+					<li th:classappend="${classActiveAccount}? 'in active'"><a href="#tab-1" data-toggle="tab"> <span> Create new Account</span></a></li>
+					<li th:classappend="${classActiveLogin}? 'in active'"><a href="#tab-2" data-toggle="tab"> <span> Login</span> </a></li>
+					<li th:classappend="${classActiveReset}? 'in active'"><a href="#tab-3" data-toggle="tab"> <span> Forget Password</span> </a></li>
 
 				</ul>
 
@@ -46,12 +44,15 @@
 								<div class="panel-body"
 									style="background-color: #ededed; margin-top: 20px;">
 									
-									<div  class="alert alert-info" th:if="${emailSent}">An email has been sent to your email address</div>
+									<div  class="alert alert-info" th:if="${emailSent}">An
+										email has been sent to the email address you just registered.
+										Please validate your email address and update your password
+										information.</div>
 
 									<form th:action="@{/newUser}" method="post">
 										<div class="form-group">
 											<label for="newUsername">* Username:</label> 
-											 &nbsp; <span style="color: red;" th:if="${userExist}"> Username Already Exist choose a different one !</span>
+											 &nbsp; <span style="color: red;" th:if="${userExist}"> Username already exists. Choose a different one !</span>
 										  <input
 												type="text" id="username" name="username"
 												required="required" class="form-control" />
@@ -61,7 +62,7 @@
 
 										<div class="form-group">
 											<label for="Email">* Email:</label> 
-							  	 &nbsp; <span style="color: red;" th:if="${emailExist}"> Email Already Exist, choose a different one !</span>
+							  	 &nbsp; <span style="color: red;" th:if="${emailExist}"> Email already exists, choose a different one !</span>
 											
 											
 											<input type="text"	id="email" name="email" required="required"
@@ -179,7 +180,7 @@
 
 
 
-				<div th:replace="common/header::footer"></div>
+		
 
 	<div th:replace="common/header::body-bottom-script"></div>
 

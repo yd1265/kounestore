@@ -12,4 +12,10 @@ public interface BookService {
 	void deleteBook(Long id);
 
 	Book findOne(Long id);
+	
+	
+	List<Book> findByCategory(String category);
+	
+	
+	List<Book> blurrySearch(String title);
 }

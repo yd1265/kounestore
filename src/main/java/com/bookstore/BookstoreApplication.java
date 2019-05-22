@@ -24,11 +24,11 @@ public class BookstoreApplication  implements CommandLineRunner{
 	@Override
 	public void run(String... args) throws Exception {
        User user1=new User();
-       user1.setFirstName("youssouf");
-       user1.setLastName("Diallo");
-       user1.setUsername("ydiallo");
+       user1.setFirstName("alseny");
+       user1.setLastName("diallo");
+       user1.setUsername("safabhe");
 		user1.setPassword(SecurityUtility.passwordEncoder().encode("diallo"));
-		user1.setEmail("youssoufkounet@gmail.com");
+		user1.setEmail("alsenybillodiallo@gmail.com");
 		
 		Set<UserRole> userRoles=new HashSet<UserRole>();
 		Role role1=new Role();
